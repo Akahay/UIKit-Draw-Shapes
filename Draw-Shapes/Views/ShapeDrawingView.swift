@@ -10,20 +10,35 @@ import UIKit
 class ShapeDrawingView: UIView {
     private weak var context:CGContext!
     
-    public var lineModel:LineModel!
-    public var drawLines:[LineModel] = []
+    private var line: LineModel?
+    private var rectModel: RectangleModel?
+    private var freehand: FreehandModel?
+
+    private var drawLines: [LineModel] = []
+    private var drawRects: [RectangleModel] = []
+    private var drawFreehands: [FreehandModel] = []
     
-    public var rectModel:RectangleModel!
-    public var drawRects:[RectangleModel] = []
+    private let whiteSelectedCGColor = UIColor.white.cgColor
+    private let yellowSelectedCGColor = UIColor.yellow.cgColor
+
+    private let normalAlphaValue: CGFloat = 1
+    private let selectedAlphaValue: CGFloat = 1
     
-    public var freehandModel:FreehandModel!
-    public var drawFreehands:[FreehandModel] = []
+    func set(line: LineModel?, rect: RectangleModel?, freehand: FreehandModel?) {
+        self.line = line
+        self.rectModel = rect
+        self.freehand = freehand
+    }
     
-    let whiteSelectedCGColor = UIColor.white.cgColor
-    let yellowSelectedCGColor = UIColor.yellow.cgColor
+    func set(drawLines: [LineModel], drawRects: [RectangleModel], drawFreehands: [FreehandModel]) {
+        self.drawLines = drawLines
+        self.drawRects = drawRects
+        self.drawFreehands = drawFreehands
+    }
     
-    let normalAlphaValue:CGFloat = 1
-    let selectedAlphaValue:CGFloat = 1
+    func set(rect: RectangleModel?) {
+        rectModel = rect
+    }
     
     override func draw(_ rect: CGRect) {
         
@@ -32,20 +47,24 @@ class ShapeDrawingView: UIView {
         context.setStrokeColor(whiteSelectedCGColor)
         context.setLineWidth(2)
         
-        if let line = lineModel {
+        if let line {
             drawLine(pointA: line.startPoint, pointB: line.endPoint, isSelected: true,width: line.strength)
         }
-        for line in drawLines {
-            drawLine(pointA: line.startPoint, pointB: line.endPoint, isSelected: line.isSelected,width: line.strength)
-        }
+        
         if let rect = rectModel {
             drawRect(pointA: rect.pointA, pointB: rect.pointB, pointC: rect.pointC, pointD: rect.pointD, isSelected: true, width: rect.strength)
         }
+        
+        if let freehand {
+            drawFreehand(points: freehand.pointArray, isSelected: true,width: freehand.strength)
+        }
+        
+        for line in drawLines {
+            drawLine(pointA: line.startPoint, pointB: line.endPoint, isSelected: line.isSelected,width: line.strength)
+        }
+        
         for rect in drawRects {
             drawRect(pointA: rect.pointA, pointB: rect.pointB, pointC: rect.pointC, pointD: rect.pointD, isSelected: rect.isSelected, width: rect.strength)
-        }
-        if let freehand = freehandModel {
-            drawFreehand(points: freehand.pointArray, isSelected: true,width: freehand.strength)
         }
         for freehand in drawFreehands {
             drawFreehand(points: freehand.pointArray, isSelected: freehand.isSelected,width: freehand.strength)

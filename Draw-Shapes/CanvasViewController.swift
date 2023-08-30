@@ -146,23 +146,19 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
         }
         return resultPoint
     }
-    private func assignToCanvasIndivisualShape(){
-        canvasView.lineModel = newLine
-        canvasView.rectModel = newRect
-        canvasView.freehandModel = newFreehand
+    private func assignToCanvasIndivisualShape() {
+        canvasView.set(line: newLine, rect: newRect, freehand: newFreehand)
     }
-    private func emptyIndivisualShape(){
+    private func emptyIndivisualShape() {
         newLine = nil
         newRect = nil
         newFreehand = nil
     }
-    private func assignToCanvasShapeArray(){
-        canvasView.drawFreehands = freehandArray
-        canvasView.drawLines = lineArray
-        canvasView.drawRects = rectArray
+    private func assignToCanvasShapeArray() {
+        canvasView.set(drawLines: lineArray, drawRects: rectArray, drawFreehands: freehandArray)
     }
 
-    func hideOption(isHidden: Bool){
+    func hideOption(isHidden: Bool) {
         shapesOptionStackView.isHidden = isHidden
         addPhotoButton.isHidden = isHidden
     }
@@ -293,7 +289,7 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
                 }
                 newRect.isSelected = true
                 if newRect.newShape {
-                    canvasView.rectModel = createRect(rect: newRect, to: currentPoint)
+                    canvasView.set(rect: createRect(rect: newRect, to: currentPoint))
                 } else {
                     updateRect(rect: newRect, deviation: deviation)
                     prevPoint = currentPoint
@@ -500,17 +496,18 @@ extension CanvasViewController {
     }
     
     private func closeToShapePoint(tapPoint: CGPoint) -> Any? {
-        var isSelected = false
+        
         let proximity: CGFloat = 20
         switch shapeType {
         case .line:
+            var isSelected = true
             for line in lineArray {
                 if line.startPoint.distance(point: tapPoint) < proximity {
-                    isSelected = true
                     pointState = .startPoint
                 } else if line.endPoint.distance(point: tapPoint) < proximity {
-                    isSelected = true
                     pointState = .endPoint
+                } else {
+                    isSelected = false
                 }
                 if isSelected {
                     return line
@@ -518,19 +515,18 @@ extension CanvasViewController {
             }
             
         case .rect:
+            var isSelected = true
             for rect in rectArray {
                 if rect.pointA.distance(point: tapPoint) < proximity {
-                    isSelected = true
                     pointState = .pointA
                 } else if rect.pointB.distance(point: tapPoint) < proximity {
-                    isSelected = true
                     pointState = .pointB
                 } else if rect.pointC.distance(point: tapPoint) < proximity {
-                    isSelected = true
                     pointState = .pointC
                 } else if rect.pointD.distance(point: tapPoint) < proximity {
-                    isSelected = true
                     pointState = .pointD
+                } else {
+                    isSelected = false
                 }
                 if isSelected {
                     return rect
