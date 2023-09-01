@@ -1,5 +1,5 @@
 //
-//  ModelItem.swift
+//  Model.swift
 //  Draw-Shapes
 //
 //  Created by Akshay Naithani on 30/08/23.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ModelItem {
+class Model {
     let uuid: UUID = UUID()
     var newShape: Bool = true
     var isSelected: Bool = true

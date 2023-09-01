@@ -1,5 +1,5 @@
 //
-//  RectangleModel.swift
+//  Rectangle.swift
 //  Draw-Shapes
 //
 //  Created by Akshay Naithani on 30/08/23.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class RectangleModel: ModelItem {
+class Rectangle: Model {
     
     var pointA: CGPoint = .zero
     var pointB: CGPoint = .zero

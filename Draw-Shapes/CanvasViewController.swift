@@ -8,9 +8,9 @@
 import UIKit
 
 enum SelectedShape {
-    case line(value: LineModel)
-    case rectangle(value: RectangleModel)
-    case freehand(value: FreehandModel)
+    case line(value: Line)
+    case rectangle(value: Rectangle)
+    case freehand(value: Freehand)
     case none
 }
 
@@ -30,20 +30,19 @@ class CanvasViewController: UIViewController, UIImagePickerControllerDelegate, U
     private var selectedRectType: SelectedSide = .none
     private var pointState: PointState = .none
 
-    private var tapGestureRecognizer: UITapGestureRecognizer?
     private var panGestureRecognizer: UIPanGestureRecognizer?
 
     private var selectedShape: SelectedShape = .none
     private var startPoint: CGPoint = .zero
     private var prevPoint: CGPoint = .zero
 
-    private var newLine: LineModel?
-    private var newRect: RectangleModel?
-    private var newFreehand: FreehandModel?
+    private var line: Line?
+    private var rect: Rectangle?
+    private var freehand: Freehand?
 
-    private var lineArray: [LineModel] = []
-    private var rectArray: [RectangleModel] = []
-    private var freehandArray: [FreehandModel] = []
+    private var lines: [Line] = []
+    private var rectangles: [Rectangle] = []
+    private var freehands: [Freehand] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,23 +82,30 @@ class CanvasViewController: UIViewController, UIImagePickerControllerDelegate, U
     @IBAction private func deleteShape(_ sender: UIButton) {
         switch selectedShape {
         case .line(let value):
-            lineArray = lineArray.filter { $0.uuid != value.uuid }
-            newLine = nil
+            
+            lines = lines.filter { $0.uuid != value.uuid }
+            canvasView.lines = lines
+            line = nil
+            canvasView.line = line
+            
         case .rectangle(let value):
-            rectArray = rectArray.filter { $0.uuid != value.uuid }
-            newRect = nil
+            
+            rectangles = rectangles.filter { $0.uuid != value.uuid }
+            canvasView.rectangles = rectangles
+            rect = nil
+            canvasView.rectangle = rect
+            
         case .freehand(let value):
-            freehandArray = freehandArray.filter { $0.uuid != value.uuid }
-            newFreehand = nil
+            
+            freehands = freehands.filter { $0.uuid != value.uuid }
+            canvasView.freehands = freehands
+            freehand = nil
+            canvasView.freehand = freehand
+            
         case .none:
             return
         }
-        
-        emptyIndivisualShape()
-        assignToCanvasIndivisualShape()
-        assignToCanvasShapeArray()
         canvasView.setNeedsDisplay()
-        
         hideBottomView(isHidden: true)
     }
 }
@@ -108,15 +114,23 @@ class CanvasViewController: UIViewController, UIImagePickerControllerDelegate, U
 extension CanvasViewController: UIGestureRecognizerDelegate {
     @IBAction func setDrawingType(btn: UIButton) {
         if btn.tag == 0 {
+            
             shapeType = .line
+            
         } else if btn.tag == 1 {
+            
             shapeType = .rect
             rectType = .moveShape
+            
         } else if btn.tag == 2 {
+            
             shapeType = .rect
             rectType = .moveArm
+            
         } else if btn.tag == 3 {
+            
             shapeType = .freehand
+            
         }
         hideBottomView(isHidden: true)
     }
@@ -125,7 +139,6 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         tapGestureRecognizer.delegate = self
         canvasView.addGestureRecognizer(tapGestureRecognizer)
-        self.tapGestureRecognizer = tapGestureRecognizer
         
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         panGestureRecognizer.delegate = self
@@ -138,24 +151,8 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
             startPoint = location
         }
     }
-    private func addPoints(points: [CGPoint])->CGPoint{
-        var resultPoint: CGPoint = .zero
-        for point in points{
-            resultPoint.x = resultPoint.x + point.x
-            resultPoint.y = resultPoint.y + point.y
-        }
-        return resultPoint
-    }
-    private func assignToCanvasIndivisualShape() {
-        canvasView.set(line: newLine, rect: newRect, freehand: newFreehand)
-    }
-    private func emptyIndivisualShape() {
-        newLine = nil
-        newRect = nil
-        newFreehand = nil
-    }
-    private func assignToCanvasShapeArray() {
-        canvasView.set(drawLines: lineArray, drawRects: rectArray, drawFreehands: freehandArray)
+    private func addPoints(points: [CGPoint])->CGPoint {
+        points.reduce(CGPoint.zero) { .init(x: $0.x + $1.x, y: $0.y + $1.y) }
     }
 
     func hideOption(isHidden: Bool) {
@@ -163,7 +160,7 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
         addPhotoButton.isHidden = isHidden
     }
     
-    private func createRect(rect: RectangleModel,to point: CGPoint) -> RectangleModel{
+    private func createRect(rect: Rectangle,to point: CGPoint) -> Rectangle {
         rect.pointD = point
         rect.pointC = CGPoint(x: point.x, y:  rect.pointA.y)
         rect.pointB = CGPoint(x: rect.pointA.x, y: point.y)
@@ -171,15 +168,9 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
     }
     
     private func deselectAllShapes(){
-        for line in lineArray {
-            line.isSelected = false
-        }
-        for rect in rectArray {
-            rect.isSelected = false
-        }
-        for freehand in freehandArray {
-            freehand.isSelected = false
-        }
+        lines.forEach { $0.isSelected = false }
+        rectangles.forEach { $0.isSelected = false }
+        freehands.forEach { $0.isSelected = false }
     }
     
     @objc func handleTap(_ sender: UITapGestureRecognizer) {
@@ -193,20 +184,20 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
         let currentPoint = addPoints(points: [startPoint,presentPoint])
         switch shapeType {
         case .line:
-            if let lineValue = closeToShape(tapPoint: currentPoint) as? LineModel {
+            if let lineValue = closeToShape(tapPoint: currentPoint) as? Line {
                 lineValue.isSelected = true
                 selectedShape = .line(value: lineValue)
                 isBottomViewHidden = false
             }
         case .rect:
-            if let rectValue = closeToShape(tapPoint: currentPoint) as? RectangleModel {
+            if let rectValue = closeToShape(tapPoint: currentPoint) as? Rectangle {
                 rectValue.isSelected = true
                 selectedShape = .rectangle(value: rectValue)
                 isBottomViewHidden = false
             }
 
         case .freehand:
-            if let freehandValue = closeToShape(tapPoint: currentPoint) as? FreehandModel {
+            if let freehandValue = closeToShape(tapPoint: currentPoint) as? Freehand {
                 freehandValue.isSelected = true
                 selectedShape = .freehand(value: freehandValue)
                 isBottomViewHidden = false
@@ -224,172 +215,168 @@ extension CanvasViewController: UIGestureRecognizerDelegate {
         let currentPoint = addPoints(points: [startPoint, presentPoint])
         var showImage = false
         let deviation = currentPoint.minus(point: prevPoint)
-        switch sender.state {
-        case .began:
-            hideOption(isHidden: true)
-            switch shapeType {
-            case .line:
-                if let lineValue = closeToShapePoint(tapPoint: currentPoint) as? LineModel {
+        
+        switch shapeType {
+        case .line:
+            switch sender.state {
+            case .began:
+                hideOption(isHidden: true)
+                if let lineValue = closeToShapePoint(tapPoint: currentPoint) as? Line {
                     lineValue.newShape = false
-                    newLine = lineValue
+                    line = lineValue
                     prevPoint = currentPoint
-                } else if let lineValue = closeToShape(tapPoint: currentPoint) as? LineModel {
+                } else if let lineValue = closeToShape(tapPoint: currentPoint) as? Line {
                     lineValue.newShape = false
-                    newLine = lineValue
+                    line = lineValue
                     prevPoint = currentPoint
                 } else {
-                    newLine = LineModel(startPoint: currentPoint, endPoint: .zero)
+                    line = Line(startPoint: currentPoint, endPoint: .zero)
                 }
-                
-            case .rect:
-                if let rectValue = closeToShapePoint(tapPoint: currentPoint) as? RectangleModel {
+            case .changed:
+                showImage = true
+                guard let line else {
+                    return
+                }
+                line.isSelected = true
+                if line.newShape {
+                    line.endPoint = currentPoint
+                } else {
+                    updateLine(line: line, deviation: deviation)
+                    prevPoint = currentPoint
+                }
+                canvasView.line = line
+            case .ended:
+                hideOption(isHidden: false)
+                showImage = true
+                guard let line else {
+                    return
+                }
+                line.isSelected = true
+                if line.newShape {
+                    line.endPoint = currentPoint
+                    lines.append(line)
+                } else {
+                    updateLine(line: line, deviation: deviation)
+                }
+                self.line = nil
+                canvasView.line = self.line
+                canvasView.lines = lines
+            default:
+                break
+            }
+        case .rect:
+            switch sender.state {
+            case .began:
+                hideOption(isHidden: true)
+                if let rectValue = closeToShapePoint(tapPoint: currentPoint) as? Rectangle {
                     rectValue.newShape = false
-                    newRect = rectValue
+                    rect = rectValue
                     prevPoint = currentPoint
-                } else if let rectValue = closeToShape(tapPoint: currentPoint) as? RectangleModel {
+                } else if let rectValue = closeToShape(tapPoint: currentPoint) as? Rectangle {
                     rectValue.newShape = false
-                    newRect = rectValue
+                    rect = rectValue
                     prevPoint = currentPoint
                 } else {
-                    newRect = RectangleModel(pointA: currentPoint, pointB: .zero, pointC: .zero, pointD: .zero)
+                    rect = Rectangle(pointA: currentPoint, pointB: .zero, pointC: .zero, pointD: .zero)
                 }
-                
-            case .freehand:
-                if let freehandValue = closeToShapePoint(tapPoint: currentPoint) as? FreehandModel {
+            case .changed:
+                showImage = true
+                guard let rect else {
+                    return
+                }
+                rect.isSelected = true
+                if rect.newShape {
+                    canvasView.rectangle = createRect(rect: rect, to: currentPoint)
+                } else {
+                    updateRect(rect: rect, deviation: deviation)
+                    prevPoint = currentPoint
+                }
+                canvasView.rectangle = rect
+
+            case .ended:
+                hideOption(isHidden: false)
+                showImage = true
+                guard let rect else {
+                    return
+                }
+                rect.isSelected = true
+                if rect.newShape {
+                    rectangles.append(createRect(rect: rect, to: currentPoint))
+                } else {
+                    updateRect(rect: rect, deviation: deviation)
+                }
+                self.rect = nil
+                canvasView.rectangle = self.rect
+                canvasView.rectangles = rectangles
+            default:
+                break
+            }
+        case .freehand:
+            
+            switch sender.state {
+            case .began:
+                hideOption(isHidden: true)
+                if let freehandValue = closeToShapePoint(tapPoint: currentPoint) as? Freehand {
                     freehandValue.newShape = false
-                    newFreehand = freehandValue
+                    freehand = freehandValue
                     prevPoint = currentPoint
-                } else if let freehandValue = closeToShape(tapPoint: currentPoint) as? FreehandModel {
+                } else if let freehandValue = closeToShape(tapPoint: currentPoint) as? Freehand {
                     freehandValue.newShape = false
-                    newFreehand = freehandValue
+                    freehand = freehandValue
                     prevPoint = currentPoint
                 } else {
-                    newFreehand = FreehandModel(pointArray: [currentPoint])
+                    freehand = Freehand(pointArray: [currentPoint])
                 }
+            case .changed:
+                showImage = true
+                guard let freehand else {
+                    return
+                }
+                freehand.isSelected = true
+                if freehand.newShape {
+                    freehand.pointArray.append(currentPoint)
+                } else {
+                    updateFreehand(freehand: freehand, deviation: deviation)
+                    prevPoint = currentPoint
+                }
+                canvasView.freehand = freehand
+            case .ended:
+                hideOption(isHidden: false)
+                showImage = true
+                guard let freehand else {
+                    return
+                }
+                freehand.isSelected = true
+                if freehand.newShape {
+                    freehand.pointArray.append(currentPoint)
+                    freehands.append(freehand)
+                } else {
+                    updateFreehand(freehand: freehand, deviation: deviation)
+                }
+                self.freehand = nil
+                canvasView.freehand = self.freehand
+                canvasView.freehands = freehands
+            default:
+                break
             }
-            
-        case .changed:
-            showImage = true
-            switch shapeType {
-            case .line:
-                guard let newLine else {
-                    return
-                }
-                newLine.isSelected = true
-                if newLine.newShape {
-                    newLine.endPoint = currentPoint
-                } else {
-                    updateLine(line: newLine, deviation: deviation)
-                    prevPoint = currentPoint
-                }
-                
-            case .rect:
-                guard let newRect else {
-                    return
-                }
-                newRect.isSelected = true
-                if newRect.newShape {
-                    canvasView.set(rect: createRect(rect: newRect, to: currentPoint))
-                } else {
-                    updateRect(rect: newRect, deviation: deviation)
-                    prevPoint = currentPoint
-                }
-                
-            case .freehand:
-                guard let newFreehand else {
-                    return
-                }
-                newFreehand.isSelected = true
-                if newFreehand.newShape {
-                    newFreehand.pointArray.append(currentPoint)
-                } else {
-                    updateFreehand(freehand: newFreehand, deviation: deviation)
-                    prevPoint = currentPoint
-                }
-            }
-            assignToCanvasIndivisualShape()
-            
-        case .ended:
-            hideOption(isHidden: false)
-            showImage = true
-            switch shapeType {
-            case .line:
-                guard let newLine else {
-                    return
-                }
-                newLine.isSelected = true
-                if newLine.newShape {
-                    newLine.endPoint = currentPoint
-                    lineArray.append(newLine)
-                } else {
-                    updateLine(line: newLine, deviation: deviation)
-                }
-                
-            case .rect:
-                guard let newRect else {
-                    return
-                }
-                newRect.isSelected = true
-                if newRect.newShape {
-                    let rect = createRect(rect: newRect, to: currentPoint)
-                    rectArray.append(rect)
-                } else {
-                    updateRect(rect: newRect, deviation: deviation)
-                }
-                
-            case .freehand:
-                guard let newFreehand else {
-                    return
-                }
-                newFreehand.isSelected = true
-                if newFreehand.newShape {
-                    newFreehand.pointArray.append(currentPoint)
-                    freehandArray.append(newFreehand)
-                } else {
-                    updateFreehand(freehand: newFreehand, deviation: deviation)
-                }
-                
-            }
-            emptyIndivisualShape()
-            assignToCanvasIndivisualShape()
-            assignToCanvasShapeArray()
-            
-        default:
-            break
-        }
-        if showImage{
-            canvasView.setNeedsDisplay()
         }
         
-    }
-    private func printLines(){
-        print("Lines:")
-        for line in lineArray{
-            print("\(line) startPoint:\(line.startPoint) endPoint:\(line.endPoint)")
+        if showImage {
+            canvasView.setNeedsDisplay()
         }
-    }
-    private func printRects(){
-        print("Rectangles:")
-        for rect in rectArray{
-            print("\(rect) pointA:\(rect.pointA) pointB:\(rect.pointB) pointC:\(rect.pointC) pointD:\(rect.pointD)")
-        }
-    }
-    func printAllShapes(){
-        printLines()
-        printRects()
     }
  
 }
 
 extension CanvasViewController {
     //MARK:- Updating shapes values
-    private func updateFreehand(freehand: FreehandModel,deviation: CGPoint) {
+    private func updateFreehand(freehand: Freehand, deviation: CGPoint) {
         freehand.pointArray = freehand.pointArray.map { item in
             CGPoint(x: item.x + deviation.x, y: item.y + deviation.y)
         }
     }
     
-    private func updateLine(line: LineModel,deviation: CGPoint){
+    private func updateLine(line: Line, deviation: CGPoint){
         if pointState == .none {
             line.startPoint = line.startPoint.add(point: deviation)
             line.endPoint = line.endPoint.add(point: deviation)
@@ -398,11 +385,10 @@ extension CanvasViewController {
         } else if pointState == .endPoint {
             line.endPoint = line.endPoint.add(point: deviation)
         }
-        
     }
     
     
-    private func updateRect(rect: RectangleModel,deviation: CGPoint){
+    private func updateRect(rect: Rectangle,deviation: CGPoint){
         if pointState == .none {
             if rectType == .moveArm {
                 if selectedRectType == .ab {
@@ -439,11 +425,11 @@ extension CanvasViewController {
         abs(pointA.distance(point: tapPoint) + pointB.distance(point: tapPoint) - pointA.distance(point: pointB)) < 5
     }
     
-    private func isCloseLine(line: LineModel,tapPoint: CGPoint) -> LineModel? {
+    private func isCloseLine(line: Line,tapPoint: CGPoint) -> Line? {
         isLineSideClose(pointA: line.startPoint, pointB: line.endPoint, tapPoint: tapPoint) ? line : nil
     }
     
-    private func isCloseRectBody(rect: RectangleModel, tapPoint: CGPoint) -> RectangleModel? {
+    private func isCloseRectBody(rect: Rectangle, tapPoint: CGPoint) -> Rectangle? {
         if isLineSideClose(pointA: rect.pointA, pointB: rect.pointB, tapPoint: tapPoint)
             || isLineSideClose(pointA: rect.pointB, pointB: rect.pointD, tapPoint: tapPoint)
             || isLineSideClose(pointA: rect.pointD, pointB: rect.pointC, tapPoint: tapPoint)
@@ -453,7 +439,7 @@ extension CanvasViewController {
         return nil
     }
     
-    private func isCloseFreehand(freehand: FreehandModel,tapPoint: CGPoint)->FreehandModel? {
+    private func isCloseFreehand(freehand: Freehand, tapPoint: CGPoint) -> Freehand? {
         for freehandPoint in freehand.pointArray {
             if freehandPoint.distance(point: tapPoint) < 25 {
                 return freehand
@@ -465,7 +451,7 @@ extension CanvasViewController {
     private func closeToShape(tapPoint: CGPoint) -> Any? {
         switch shapeType {
         case .line:
-            for line in lineArray {
+            for line in lines {
                 if let closeLine = isCloseLine(line: line, tapPoint: tapPoint) {
                     return closeLine
                 }
@@ -474,7 +460,7 @@ extension CanvasViewController {
         case .rect:
             switch rectType {
             case .moveShape:
-                for rect in rectArray {
+                for rect in rectangles {
                     if let closeRect = isCloseRectBody(rect: rect, tapPoint: tapPoint) {
                         return closeRect
                     }
@@ -485,7 +471,7 @@ extension CanvasViewController {
             }
             
         case .freehand:
-            for freehand in freehandArray {
+            for freehand in freehands {
                 if let closeFreeHand = isCloseFreehand(freehand: freehand, tapPoint: tapPoint) {
                     return closeFreeHand
                 }
@@ -501,7 +487,7 @@ extension CanvasViewController {
         switch shapeType {
         case .line:
             var isSelected = true
-            for line in lineArray {
+            for line in lines {
                 if line.startPoint.distance(point: tapPoint) < proximity {
                     pointState = .startPoint
                 } else if line.endPoint.distance(point: tapPoint) < proximity {
@@ -516,7 +502,7 @@ extension CanvasViewController {
             
         case .rect:
             var isSelected = true
-            for rect in rectArray {
+            for rect in rectangles {
                 if rect.pointA.distance(point: tapPoint) < proximity {
                     pointState = .pointA
                 } else if rect.pointB.distance(point: tapPoint) < proximity {
@@ -540,8 +526,8 @@ extension CanvasViewController {
         return nil
     }
     
-    private func closeToRectSide(tapPoint: CGPoint) -> RectangleModel? {
-        for rect in rectArray {
+    private func closeToRectSide(tapPoint: CGPoint) -> Rectangle? {
+        for rect in rectangles {
             if isLineSideClose(pointA: rect.pointA, pointB: rect.pointB, tapPoint: tapPoint) {
                 selectedRectType = .ab
             } else if isLineSideClose(pointA: rect.pointB, pointB: rect.pointD, tapPoint: tapPoint) {

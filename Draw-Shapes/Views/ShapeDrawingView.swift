@@ -10,35 +10,19 @@ import UIKit
 class ShapeDrawingView: UIView {
     private weak var context:CGContext!
     
-    private var line: LineModel?
-    private var rectModel: RectangleModel?
-    private var freehand: FreehandModel?
+    var line: Line?
+    var rectangle: Rectangle?
+    var freehand: Freehand?
 
-    private var drawLines: [LineModel] = []
-    private var drawRects: [RectangleModel] = []
-    private var drawFreehands: [FreehandModel] = []
+    var lines: [Line] = []
+    var rectangles: [Rectangle] = []
+    var freehands: [Freehand] = []
     
     private let whiteSelectedCGColor = UIColor.white.cgColor
     private let yellowSelectedCGColor = UIColor.yellow.cgColor
 
     private let normalAlphaValue: CGFloat = 1
     private let selectedAlphaValue: CGFloat = 1
-    
-    func set(line: LineModel?, rect: RectangleModel?, freehand: FreehandModel?) {
-        self.line = line
-        self.rectModel = rect
-        self.freehand = freehand
-    }
-    
-    func set(drawLines: [LineModel], drawRects: [RectangleModel], drawFreehands: [FreehandModel]) {
-        self.drawLines = drawLines
-        self.drawRects = drawRects
-        self.drawFreehands = drawFreehands
-    }
-    
-    func set(rect: RectangleModel?) {
-        rectModel = rect
-    }
     
     override func draw(_ rect: CGRect) {
         
@@ -48,26 +32,46 @@ class ShapeDrawingView: UIView {
         context.setLineWidth(2)
         
         if let line {
-            drawLine(pointA: line.startPoint, pointB: line.endPoint, isSelected: true,width: line.strength)
+            drawLine(pointA: line.startPoint,
+                     pointB: line.endPoint,
+                     isSelected: true,
+                     width: line.strength)
         }
         
-        if let rect = rectModel {
-            drawRect(pointA: rect.pointA, pointB: rect.pointB, pointC: rect.pointC, pointD: rect.pointD, isSelected: true, width: rect.strength)
+        if let rectangle {
+            drawRect(pointA: rectangle.pointA,
+                     pointB: rectangle.pointB,
+                     pointC: rectangle.pointC,
+                     pointD: rectangle.pointD,
+                     isSelected: true,
+                     width: rectangle.strength)
         }
         
         if let freehand {
-            drawFreehand(points: freehand.pointArray, isSelected: true,width: freehand.strength)
+            drawFreehand(points: freehand.pointArray,
+                         isSelected: true,
+                         width: freehand.strength)
         }
         
-        for line in drawLines {
-            drawLine(pointA: line.startPoint, pointB: line.endPoint, isSelected: line.isSelected,width: line.strength)
+        for line in lines {
+            drawLine(pointA: line.startPoint,
+                     pointB: line.endPoint,
+                     isSelected: line.isSelected,
+                     width: line.strength)
         }
         
-        for rect in drawRects {
-            drawRect(pointA: rect.pointA, pointB: rect.pointB, pointC: rect.pointC, pointD: rect.pointD, isSelected: rect.isSelected, width: rect.strength)
+        for rectangle in rectangles {
+            drawRect(pointA: rectangle.pointA,
+                     pointB: rectangle.pointB,
+                     pointC: rectangle.pointC,
+                     pointD: rectangle.pointD,
+                     isSelected: rectangle.isSelected,
+                     width: rectangle.strength)
         }
-        for freehand in drawFreehands {
-            drawFreehand(points: freehand.pointArray, isSelected: freehand.isSelected,width: freehand.strength)
+        for freehand in freehands {
+            drawFreehand(points: freehand.pointArray,
+                         isSelected: freehand.isSelected,
+                         width: freehand.strength)
         }
         context.drawPath(using: .stroke)
         
@@ -83,7 +87,7 @@ class ShapeDrawingView: UIView {
     private func drawRect(pointA: CGPoint, pointB: CGPoint, pointC: CGPoint, pointD: CGPoint, isSelected: Bool, width: CGFloat){
         context.beginPath()
         if isSelected{
-            createCircleOnSelectedShape(points: [pointA,pointB,pointD,pointC])
+            createCircleOnSelectedShape(points: [pointA, pointB, pointD, pointC])
             drawSelectedPathWithContext(pointA: pointA, pointB: pointB, width: width)
             drawSelectedPathWithContext(pointA: pointB, pointB: pointD, width: width)
             drawSelectedPathWithContext(pointA: pointD, pointB: pointC, width: width)
@@ -134,8 +138,8 @@ class ShapeDrawingView: UIView {
             return
         }
         let radius: CGFloat = 50
-        let startAngle: CGFloat = CGFloat(CGVector.init(from: start, to: center).angle)
-        let endAngle: CGFloat = CGFloat(CGVector.init(from: center, to: end).angle)
+        let startAngle: CGFloat = .init(CGVector.init(from: start, to: center).angle)
+        let endAngle: CGFloat = .init(CGVector.init(from: center, to: end).angle)
         context.beginPath()
         context.addArc(center: center, radius: radius, startAngle: startAngle + .pi, endAngle: endAngle, clockwise: true)
         context.drawPath(using: .stroke)
@@ -143,11 +147,19 @@ class ShapeDrawingView: UIView {
         context.strokePath()
     }
     private func drawSelectedPathWithContext(pointA:CGPoint,pointB:CGPoint,width:CGFloat,isFreehandShape:Bool = false){
-            drawLinePath(pointA: pointA, pointB: pointB, strokeColor: whiteSelectedCGColor, widthValue: selectedLineWidth(width: width),alpha: selectedAlphaValue)
+            drawLinePath(pointA: pointA,
+                         pointB: pointB,
+                         strokeColor: whiteSelectedCGColor,
+                         widthValue: selectedLineWidth(width: width),
+                         alpha: selectedAlphaValue)
     }
     
     private func drawUnselectedPathWithContext(pointA:CGPoint,pointB:CGPoint,width:CGFloat,isFreehandShape:Bool = false){
-        drawLinePath(pointA: pointA, pointB: pointB, strokeColor: yellowSelectedCGColor, widthValue: width,alpha: normalAlphaValue)
+        drawLinePath(pointA: pointA,
+                     pointB: pointB,
+                     strokeColor: yellowSelectedCGColor,
+                     widthValue: width,
+                     alpha: normalAlphaValue)
     }
     
     private func drawLinePath(pointA:CGPoint,pointB:CGPoint,strokeColor:CGColor,widthValue:CGFloat,alpha: CGFloat) {

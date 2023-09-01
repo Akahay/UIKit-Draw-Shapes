@@ -13,12 +13,11 @@
 		4FB0678C2A9E9D9D002C8575 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4FB0678A2A9E9D9D002C8575 /* Main.storyboard */; };
 		4FB0678E2A9E9D9E002C8575 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FB0678D2A9E9D9E002C8575 /* Assets.xcassets */; };
 		4FB067912A9E9D9E002C8575 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4FB0678F2A9E9D9E002C8575 /* LaunchScreen.storyboard */; };
-		4FB0679A2A9E9F3B002C8575 /* LineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067992A9E9F3B002C8575 /* LineModel.swift */; };
-		4FB0679C2A9EA0F8002C8575 /* ModelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB0679B2A9EA0F8002C8575 /* ModelItem.swift */; };
-		4FB0679E2A9EA114002C8575 /* RectangleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB0679D2A9EA114002C8575 /* RectangleModel.swift */; };
+		4FB0679A2A9E9F3B002C8575 /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067992A9E9F3B002C8575 /* Line.swift */; };
+		4FB0679C2A9EA0F8002C8575 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB0679B2A9EA0F8002C8575 /* Model.swift */; };
+		4FB0679E2A9EA114002C8575 /* Rectangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB0679D2A9EA114002C8575 /* Rectangle.swift */; };
 		4FB067A32A9EA1BF002C8575 /* ShapeDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067A22A9EA1BF002C8575 /* ShapeDrawingView.swift */; };
-		4FB067A52A9EA561002C8575 /* PointItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067A42A9EA561002C8575 /* PointItem.swift */; };
-		4FB067A72A9EA573002C8575 /* FreehandModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067A62A9EA573002C8575 /* FreehandModel.swift */; };
+		4FB067A72A9EA573002C8575 /* Freehand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067A62A9EA573002C8575 /* Freehand.swift */; };
 		4FB067AA2A9EADA1002C8575 /* ShapeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067A92A9EADA1002C8575 /* ShapeType.swift */; };
 		4FB067AC2A9EADB5002C8575 /* RectType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067AB2A9EADB5002C8575 /* RectType.swift */; };
 		4FB067AE2A9EADC9002C8575 /* SelectedSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB067AD2A9EADC9002C8575 /* SelectedSide.swift */; };
@@ -35,12 +34,11 @@
 		4FB0678D2A9E9D9E002C8575 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4FB067902A9E9D9E002C8575 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4FB067922A9E9D9E002C8575 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4FB067992A9E9F3B002C8575 /* LineModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineModel.swift; sourceTree = "<group>"; };
-		4FB0679B2A9EA0F8002C8575 /* ModelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelItem.swift; sourceTree = "<group>"; };
-		4FB0679D2A9EA114002C8575 /* RectangleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleModel.swift; sourceTree = "<group>"; };
+		4FB067992A9E9F3B002C8575 /* Line.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
+		4FB0679B2A9EA0F8002C8575 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		4FB0679D2A9EA114002C8575 /* Rectangle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rectangle.swift; sourceTree = "<group>"; };
 		4FB067A22A9EA1BF002C8575 /* ShapeDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeDrawingView.swift; sourceTree = "<group>"; };
-		4FB067A42A9EA561002C8575 /* PointItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointItem.swift; sourceTree = "<group>"; };
-		4FB067A62A9EA573002C8575 /* FreehandModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreehandModel.swift; sourceTree = "<group>"; };
+		4FB067A62A9EA573002C8575 /* Freehand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Freehand.swift; sourceTree = "<group>"; };
 		4FB067A92A9EADA1002C8575 /* ShapeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeType.swift; sourceTree = "<group>"; };
 		4FB067AB2A9EADB5002C8575 /* RectType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectType.swift; sourceTree = "<group>"; };
 		4FB067AD2A9EADC9002C8575 /* SelectedSide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedSide.swift; sourceTree = "<group>"; };
@@ -96,11 +94,10 @@
 		4FB067982A9E9F2E002C8575 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				4FB0679B2A9EA0F8002C8575 /* ModelItem.swift */,
-				4FB067992A9E9F3B002C8575 /* LineModel.swift */,
-				4FB0679D2A9EA114002C8575 /* RectangleModel.swift */,
-				4FB067A42A9EA561002C8575 /* PointItem.swift */,
-				4FB067A62A9EA573002C8575 /* FreehandModel.swift */,
+				4FB0679B2A9EA0F8002C8575 /* Model.swift */,
+				4FB067992A9E9F3B002C8575 /* Line.swift */,
+				4FB0679D2A9EA114002C8575 /* Rectangle.swift */,
+				4FB067A62A9EA573002C8575 /* Freehand.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -199,15 +196,14 @@
 				4FB067A32A9EA1BF002C8575 /* ShapeDrawingView.swift in Sources */,
 				4FB067892A9E9D9D002C8575 /* CanvasViewController.swift in Sources */,
 				4FB067852A9E9D9D002C8575 /* AppDelegate.swift in Sources */,
-				4FB0679A2A9E9F3B002C8575 /* LineModel.swift in Sources */,
-				4FB067A72A9EA573002C8575 /* FreehandModel.swift in Sources */,
-				4FB0679E2A9EA114002C8575 /* RectangleModel.swift in Sources */,
+				4FB0679A2A9E9F3B002C8575 /* Line.swift in Sources */,
+				4FB067A72A9EA573002C8575 /* Freehand.swift in Sources */,
+				4FB0679E2A9EA114002C8575 /* Rectangle.swift in Sources */,
 				4FB067AE2A9EADC9002C8575 /* SelectedSide.swift in Sources */,
 				4FB067872A9E9D9D002C8575 /* SceneDelegate.swift in Sources */,
 				4FB067AA2A9EADA1002C8575 /* ShapeType.swift in Sources */,
-				4FB0679C2A9EA0F8002C8575 /* ModelItem.swift in Sources */,
+				4FB0679C2A9EA0F8002C8575 /* Model.swift in Sources */,
 				4FB067B02A9EADD7002C8575 /* PointState.swift in Sources */,
-				4FB067A52A9EA561002C8575 /* PointItem.swift in Sources */,
 				4FB067B22A9EAE4A002C8575 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

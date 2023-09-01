@@ -7,7 +7,7 @@
 
 import Foundation
 
-class LineModel: ModelItem {
+class Line: Model {
     
     var startPoint: CGPoint = .zero
     var endPoint: CGPoint = .zero
